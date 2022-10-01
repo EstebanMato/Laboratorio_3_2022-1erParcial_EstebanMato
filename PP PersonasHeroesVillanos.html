@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        body{
+            background: rgb(117, 117, 117);
+            text-align: center;
+            width: 80%; 
+            margin: 0 auto;
+            font-family: monospace;
+        }
+       
+        #form_principal{
+            background: rgb(255, 255, 255);
+            text-align: left;
+            border-radius:5px;
+        }
+
+        #form_abm{
+            background: grey;
+            text-align: left;
+            width: 50%;
+            margin: auto;
+            font-weight: bold;
+            border-radius:3px;
+        }
+
+        #form_abm input[type = "text"]{
+            border: 2px solid #f6f6f6;
+            border-radius:3px;
+            background-color:#f6f6f6;
+	        margin:5px 0;
+        }
+
+        #form_abm label{
+           font-weight:bold;
+           width: 18%;
+           display: inline-block;
+        }
+
+        .check{
+            background-color: rgba(40,65,120,1);
+            color: white;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(10 ,1fr);
+            column-gap: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        input{
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Form Datos</h1>
+    <form action="" method="" name="form1" id="form_principal" >
+        <label for="filtro">Filtrar por: </label>
+        <select id="select_filtrar" onchange=" recargarFormulario()">
+            <option value="0">Todos</option>
+            <option value="1">Heroe</option>
+            <option value="2">Villano</option>
+        </select>
+        <div>
+            <label>Calcular Edad Promedio:</label>
+            <input id="txt_promedio" type="text"  readonly>
+            <input type="button" name="btn_Calcular" value="CALCULAR" onclick="calcular()">
+        </div>
+        <div>Mostrar Columnas:</div>
+        <div id="checkboxs" class="check">
+            <div><input type="checkbox" checked="true" id="check_id" onchange="mostrarOcultar(0,checked)">ID</div>
+            <div><input type="checkbox" checked="true" id="check_nombre" onchange="mostrarOcultar(1,checked)">Nombre</div>
+            <div><input type="checkbox" checked="true" id="check_apellido" onchange="mostrarOcultar(2,checked)">Apellido</div>
+            <div><input type="checkbox" checked="true" id="check_edad" onchange="mostrarOcultar(3,checked)">Edad</div>
+            <div><input type="checkbox" checked="true" id="check_alterEgo" onchange="mostrarOcultar(4,checked)">AlterEgo</div>
+            <div><input type="checkbox" checked="true" id="check_ciudad" onchange="mostrarOcultar(5,checked)">Ciudad</div>
+            <div><input type="checkbox" checked="true" id="check_publicado" onchange="mostrarOcultar(6,checked)">Publicado</div>      
+            <div><input type="checkbox" checked="true" id="check_enemigo" onchange="mostrarOcultar(7,checked)">Enemigo</div>      
+            <div><input type="checkbox" checked="true" id="check_robos" onchange="mostrarOcultar(8,checked)">Robos</div>      
+            <div><input type="checkbox" checked="true" id="check_asesinatos" onchange="mostrarOcultar(9,checked)">Asesinatos</div>      
+        </div>
+
+        <table id="tabla" style="width: 100%;">
+            <thead id="encabezado">
+            </thead>
+            <tbody id="cuerpo">
+            </tbody>
+        </table>
+        <input type="button" name="btnAgregar" value="Agregar" onclick="agregarPersona()" class="button">
+    </form>
+    <div>
+    </div>
+    <form action="" method="" name="form2" id="form_abm" hidden>
+        Formulario ABM
+        <div><label>ID:</label>
+            <input id="txt_id" type="text" readonly></div>
+        <div><label>Nombre:</label>
+            <input id="txt_nombre" type="text"></div>
+        <div><label>Apellido:</label>
+            <input id="txt_apellido" type="text"></div>
+        <div><label>Edad:</label>
+            <input id="txt_edad" type="text" placeholder="Mayor a 18"></div>
+
+        
+        <div><label>Filtro:</label><select id="select_filtrarABM" onchange="mostrarFiltroABM()" value="--">
+            <option value="0" hidden>--</option>
+            <option value="1">Heroe</option>
+            <option value="2">Villano</option>
+        </select></div>
+        <section id ="sec_Heroe" hidden>
+        <div><label>AlterEgo:</label>
+            <input id="txt_alterEgo" type="text" ></div>
+        <div><label>Ciudad:</label>
+            <input id="txt_ciudad" type="text"></div>
+        <div><label>Publicado:</label>
+            <input id="txt_publicado" type="text" placeholder="Mayor a 1940"></div>
+        </section>
+        <section id ="sec_Villano" hidden>
+            <div><label>Enemigo:</label>
+                <input id="txt_enemigo" type="text" ></div>
+            <div><label>Robos:</label>
+                <input id="txt_robos" type="text"></div>
+            <div><label>Asesinatos:</label>
+                <input id="txt_asesinatos" type="text" placeholder="Mayor a 0"></div>
+        </section>
+        <div>
+            <input type="button" value="Alta" id="btn_alta" onclick ="alta()">
+            <input type="button" value="Modificar" id="btn_modificar" onclick="modificar()">
+            <input type="button" value="Eliminar" id="btn_eliminar" onclick="eliminar()">
+            <input type="button" value="Cancelar" id="btn_cancelar" onclick="btnCancelar()">
+        </div>
+    </form>
+</body>
+
+<script>
+    class Persona {
+        id;
+        nombre;
+        apellido;
+        edad;
+
+        constructor(id, nombre, apellido, edad) {
+            this.id = id;
+            this.nombre = nombre;
+            this.apellido = apellido;
+            this.edad=edad;
+        }
+
+        toString() {
+            return "ID: "+this.id+ " Nombre: " +this.nombre+ " " +this.apellido+ " " +this.edad+" años. "; 
+        }
+    }
+
+    class Heroe extends Persona{
+        alterEgo;
+        ciudad;
+        publicado;
+
+        constructor(id,nombre,apellido,edad,alterEgo, ciudad, publicado){
+            super(id,nombre,apellido,edad);
+            this.alterEgo=alterEgo;
+            this.ciudad=ciudad;
+            this.publicado=publicado;
+        }
+
+        toString() {
+            return super.toString() +"\nAlter Ego "+this.alterEgo+ " Ciudad " +this.ciudad+ " publicado "+this.publicado; 
+        }
+    }
+
+    class Villano extends Persona{
+        enemigo;
+        robos;
+        asesinatos;
+
+        constructor(id,nombre,apellido,edad,enemigo, robos, asesinatos){
+            super(id,nombre,apellido,edad);
+            this.enemigo=enemigo;
+            this.robos=robos;
+            this.asesinatos=asesinatos;
+        }
+
+        toString(){
+            return super.toString()+"\nEnemigo "+this.enemigo+ " robos " +this.robos+ " asesinatos "+this.asesinatos;
+        }
+    }
+
+
+    strPersonas = '[{"id":1, "nombre":"Clark", "apellido":"Kent", "edad":45, "alterego":"Superman", "ciudad":"Metropolis","publicado":2002},{"id":2, "nombre":"Bruce", "apellido":"Wayne", "edad":35, "alterego":"Batman", "ciudad":"Gotica","publicado":20012},{"id":3, "nombre":"Bart", "apellido":"Alen", "edad":30, "alterego":"Flash", "ciudad":"Central","publicado":2017},{"id":4, "nombre":"Lex", "apellido":"Luthor", "edad":18, "enemigo":"Superman", "robos":500,"asesinatos":7},{"id":5, "nombre":"Harvey", "apellido":"Dent", "edad":20, "enemigo":"Batman", "robos":750,"asesinatos":2},{"id":666, "nombre":"Celina", "apellido":"kyle", "edad":23, "enemigo":"Batman", "robos":25,"asesinatos":1}]'
+    let personas = new Array();
+    personas = convertirAObjeto(strPersonas);
+    let flagForm=0;
+
+    window.addEventListener("load", ()=>{cargarTabla(personas)});
+ 
+    document.getElementById("cuerpo").addEventListener('dblclick', (e) =>modificarPersona(e));
+
+    document.getElementById("encabezado").addEventListener('click', (e) =>ordenarTabla(e));
+
+
+    
+    function convertirAObjeto(texto) {
+        let vectorP = JSON.parse(texto);
+        let arrayP= new Array();
+
+        vectorP.forEach(e => {
+            if (e.hasOwnProperty("alterego")) {
+                arrayP.push(new Heroe(e.id,e.nombre,e.apellido,e.edad,e.alterego,e.ciudad,e.publicado));
+            } else {
+                arrayP.push(new Villano(e.id,e.nombre,e.apellido,e.edad,e.enemigo,e.robos,e.asesinatos));
+            }
+        });
+        return arrayP;
+    }
+
+    function cargarEncabezados() { 
+        let encabezados = document.getElementById("encabezado");
+        encabezados.innerHTML = "";
+
+        let fila = document.createElement("tr");
+
+        if ((document.getElementById("check_id").checked)) {
+            let id = document.createElement("td");
+            let btnId = document.createElement("input");
+            btnId.value = "ID";
+            btnId.id = "id";
+            btnId.type = "button"
+            id.appendChild(btnId);
+            fila.appendChild(id);
+        }
+        if ((document.getElementById("check_nombre").checked)) {
+            let nombre = document.createElement("td");
+            let btnNombre = document.createElement("input");
+            btnNombre.value = "Nombre";
+            btnNombre.id = "nombre";
+            btnNombre.type = "button"
+            nombre.appendChild(btnNombre);
+            fila.appendChild(nombre);
+        }
+
+        if ((document.getElementById("check_apellido").checked)) {
+            let apellido = document.createElement("td");
+            let btnApellido = document.createElement("input");
+            btnApellido.value = "Apellido";
+            btnApellido.id = "apellido";
+            btnApellido.type = "button"
+            apellido.appendChild(btnApellido);
+            fila.appendChild(apellido);
+        }
+
+       
+        if ((document.getElementById("check_edad").checked)) {
+            let edad = document.createElement("td");
+            let btnEdad = document.createElement("input");
+            btnEdad.value = "Edad";
+            btnEdad.id = "edad";
+            btnEdad.type = "button"
+            edad.appendChild(btnEdad);
+            fila.appendChild(edad);
+        }
+
+        if ((document.getElementById("check_alterEgo").checked)) {
+            let alterEgo = document.createElement("td");
+            let btnAlterEgo = document.createElement("input");
+            btnAlterEgo.value = "AlterEgo";
+            btnAlterEgo.id = "alterEgo";
+            btnAlterEgo.type = "button"
+            alterEgo.appendChild(btnAlterEgo);
+            fila.appendChild(alterEgo);
+        }
+
+        if ((document.getElementById("check_ciudad").checked)) {
+            let ciudad = document.createElement("td");
+            let btnCiudad = document.createElement("input");
+            btnCiudad.value = "Ciudad";
+            btnCiudad.id = "ciudad";
+            btnCiudad.type = "button"
+            ciudad.appendChild(btnCiudad);
+            fila.appendChild(ciudad);
+        }
+
+        if ((document.getElementById("check_publicado").checked)) {
+            let publicado = document.createElement("td");
+            let btnPublicado = document.createElement("input");
+            btnPublicado.value = "Publicado";
+            btnPublicado.id = "publicado";
+            btnPublicado.type = "button"
+            publicado.appendChild(btnPublicado);
+            fila.appendChild(publicado);
+        }
+        if ((document.getElementById("check_enemigo").checked)) {
+            let enemigo = document.createElement("td");
+            let btnEnemigo = document.createElement("input");
+            btnEnemigo.value = "Enemigo";
+            btnEnemigo.id = "enemigo";
+            btnEnemigo.type = "button"
+            enemigo.appendChild(btnEnemigo);
+            fila.appendChild(enemigo);
+        }
+        if ((document.getElementById("check_robos").checked)) {
+            let robos = document.createElement("td");
+            let btnRobos = document.createElement("input");
+            btnRobos.value = "Robos";
+            btnRobos.id = "robos";
+            btnRobos.type = "button"
+            robos.appendChild(btnRobos);
+            fila.appendChild(robos);
+        }
+        if ((document.getElementById("check_asesinatos").checked)) {
+            let asesinatos = document.createElement("td");
+            let btnAsesinatos = document.createElement("input");
+            btnAsesinatos.value = "Asesinatos";
+            btnAsesinatos.id = "asesinatos";
+            btnAsesinatos.type = "button"
+            asesinatos.appendChild(btnAsesinatos);
+            fila.appendChild(asesinatos);
+        }
+
+        encabezados.appendChild(fila);
+    }
+
+    function checkAll() {
+        let container = document.getElementById("checkboxs");
+
+        let checks = container.getElementsByTagName('input');
+
+        for (i = 0; i < checks.length; i++) {
+            checks[i].checked = "true";
+        }
+    }
+
+    function addCelda(fila,text)
+    {
+        let td = document.createElement("td");
+        td.appendChild(document.createTextNode(text));
+        fila.appendChild(td);
+    }
+
+    function cargarTabla(personas) {
+        document.getElementById("cuerpo").innerHTML ="";
+
+        cargarEncabezados();
+        personas.forEach(persona => {
+            let fila = document.createElement("tr");
+
+            if ((document.getElementById("check_id").checked)) {addCelda(fila,persona.id)}
+            if ((document.getElementById("check_nombre").checked)) {addCelda(fila,persona.nombre)}
+            if ((document.getElementById("check_apellido").checked)) {addCelda(fila,persona.apellido)}
+            if ((document.getElementById("check_edad").checked)) {addCelda(fila,persona.edad)}
+
+            if(persona.hasOwnProperty("alterEgo")){
+                if ((document.getElementById("check_alterEgo").checked)) {addCelda(fila,persona.alterEgo)}
+                if ((document.getElementById("check_ciudad").checked)) {addCelda(fila,persona.ciudad)}
+                if ((document.getElementById("check_publicado").checked)) {addCelda(fila,persona.publicado)}
+                if ((document.getElementById("check_enemigo").checked)) {addCelda(fila,"--")}
+                if ((document.getElementById("check_robos").checked)) {addCelda(fila,"--")}
+                if ((document.getElementById("check_asesinatos").checked)) {addCelda(fila,"--")}
+            }
+            if(persona.hasOwnProperty("enemigo")){
+                if ((document.getElementById("check_alterEgo").checked)) {addCelda(fila,"--")}
+                if ((document.getElementById("check_ciudad").checked)) {addCelda(fila,"--")}
+                if ((document.getElementById("check_publicado").checked)) {addCelda(fila,"--")}
+                if ((document.getElementById("check_enemigo").checked)) {addCelda(fila,persona.enemigo)}
+                if ((document.getElementById("check_robos").checked)) {addCelda(fila,persona.robos)}
+                if ((document.getElementById("check_asesinatos").checked)) {addCelda(fila,persona.asesinatos)}
+            }
+            
+            document.getElementById("cuerpo").appendChild(fila);
+        })
+    }
+
+    function recargarFormulario(){
+         cargarTabla(getFiltradoPersonas());
+    }
+
+    function getFiltradoPersonas(){
+        if(document.getElementById("select_filtrar").value == 1)
+        {
+            return (personas.filter(persona => persona.hasOwnProperty("alterEgo")));
+        } else if (document.getElementById("select_filtrar").value  == 2){
+            return (personas.filter(persona => persona.hasOwnProperty("enemigo")));
+        }
+        else{
+            return (personas);
+        }
+    }
+
+    function mostrarFiltroABM(){
+        if(document.getElementById("select_filtrarABM").value == 1){
+            document.getElementById("sec_Heroe").style.display ="inline";
+            document.getElementById("sec_Villano").style.display ="none";
+
+        }else{
+            document.getElementById("sec_Villano").style.display ="inline";
+            document.getElementById("sec_Heroe").style.display ="none";
+        }
+    }
+
+    function calcular(){
+        let suma = getFiltradoPersonas().reduce((acum, persona) => (acum += persona.edad, acum),0);
+        document.getElementById("txt_promedio").value=suma/getFiltradoPersonas().length;
+    }
+
+    function crearColumna(fila,texto)
+    {
+        let columna = document.createElement("td");
+        columna.appendChild(document.createTextNode(texto));
+        fila.appendChild(columna);
+    }
+
+    function mostrarOcultar(ciudad, estado) {
+        let tabla = document.getElementById("tabla");
+        let fila = tabla.getElementsByTagName('tr');
+        if (!estado) {
+            for (i = 0; i < fila.length; i++) {
+                fila[i].getElementsByTagName('td')[ciudad].style.display = "none";
+            }
+        }
+        else {
+            for (i = 0; i < fila.length; i++) {
+                fila[i].getElementsByTagName('td')[ciudad].style.display = "table-cell";
+            }
+        }
+    }   
+
+    function switchForm() {
+        if(!flagForm){
+            document.getElementById("form_principal").style.display = "none";
+            document.getElementById("form_abm").style.display = "block";
+            flagForm=true;
+        }else{        
+        document.getElementById("form_principal").style.display = "block";
+        document.getElementById("form_abm").style.display = "none";
+        flagForm=false;
+        }
+        //tiene que limpiar el formulario
+        document.getElementById("txt_id").value = "";
+        document.getElementById("txt_nombre").value = "";
+        document.getElementById("txt_apellido").value = "";
+        document.getElementById("txt_edad").value = "";
+        document.getElementById("txt_alterEgo").value = "";
+        document.getElementById("txt_ciudad").value = "";
+        document.getElementById("txt_publicado").value = "";
+        document.getElementById("txt_enemigo").value = "";
+        document.getElementById("txt_robos").value = "";
+        document.getElementById("txt_asesinatos").value = "";
+        document.getElementById("select_filtrarABM").value =0;
+        document.getElementById("sec_Villano").style.display = "none";
+        document.getElementById("sec_Heroe").style.display = "none";
+        document.getElementById("btn_alta").disabled = false;
+        document.getElementById("select_filtrarABM").disabled=false;
+        document.getElementById("btn_modificar").disabled = false;
+        document.getElementById("btn_eliminar").disabled = false;
+        document.getElementById("select_filtrar").value = 0;
+        personas.sort((a, b) => a.id -b.id);
+        checkAll();
+        recargarFormulario();
+    }
+
+    function getId(){
+        let id = personas.reduce((id,persona)=>{
+            if(id==persona.id){
+                return persona.id+1;
+            }else{
+                return id;
+            }
+        },1);
+        return id;
+    }
+
+    function agregarPersona(){
+        switchForm();
+        document.getElementById("txt_id").disabled = true;
+        document.getElementById("btn_modificar").disabled = true;
+        document.getElementById("btn_eliminar").disabled = true;
+        document.getElementById("txt_id").value = getId();
+    }
+
+    function btnCancelar(){
+        switchForm();
+    }
+
+    function modificarPersona(e){
+        switchForm();
+        document.getElementById("btn_alta").disabled = true;
+        document.getElementById("select_filtrarABM").disabled=true;
+
+        p=personas.filter(persona => persona.id == e.target.parentNode.firstChild.textContent)[0];
+        document.getElementById("txt_id").value = p.id;
+        document.getElementById("txt_nombre").value = p.nombre;
+        document.getElementById("txt_apellido").value = p.apellido;
+        document.getElementById("txt_edad").value = p.edad;
+
+        if (p.hasOwnProperty("alterEgo")) {           
+            document.getElementById("txt_alterEgo").value = p.alterEgo;
+            document.getElementById("txt_ciudad").value = p.ciudad;
+            document.getElementById("txt_publicado").value = p.publicado;
+            document.getElementById("select_filtrarABM").value=1;
+        } else {
+            document.getElementById("txt_enemigo").value = p.enemigo;
+            document.getElementById("txt_robos").value = p.robos;
+            document.getElementById("txt_asesinatos").value = p.asesinatos;
+            document.getElementById("select_filtrarABM").value=2;
+        }
+        mostrarFiltroABM();
+    }
+
+    function ordenarString(a="",b=""){
+        if(a>b)
+           return 1;
+            else if(a<b)
+            return -1;
+            else
+            return 0;
+    }
+
+    function ordenarNumero(a=Number.MAX_SAFE_INTEGER,b=Number.MAX_SAFE_INTEGER){
+        return a-b;
+    }
+
+    function ordenarTabla(e){
+        switch (e.target.parentNode.firstChild.id) {
+            case "id":
+                personas.sort((a,b)=>ordenarNumero(a.id,b.id));
+            break;
+            case "nombre":
+                personas.sort((a,b)=> ordenarString(a.nombre,b.nombre));
+            break;
+            case "apellido":
+                personas.sort((a,b)=> ordenarString(a.apellido,b.apellido));
+            break;
+            case "edad":
+                personas.sort((a,b)=>ordenarNumero(a.edad,b.edad));          
+            break;
+            case "alterEgo":
+                personas.sort((a,b)=> ordenarString(a.alterEgo,b.alterEgo));            
+            break;
+            case "ciudad":
+                personas.sort((a,b)=> ordenarString(a.ciudad,b.ciudad));            
+            break;
+            case "publicado":
+                personas.sort((a,b)=>ordenarNumero(a.publicado,b.publicado));            
+            break;
+            case "enemigo":
+                personas.sort((a,b)=> ordenarString(a.enemigo,b.enemigo));            
+            break;
+            case "robos":
+                personas.sort((a,b)=> ordenarNumero(a.robos,b.robos));            
+            break;
+            case "asesinatos":
+                personas.sort((a,b)=>ordenarNumero(a.asesinatos,b.asesinatos));
+            break;
+        
+            default:
+            break;
+        }
+
+        recargarFormulario();
+    }   
+
+    function validarEntero(num, min)
+    {
+        if(num != null && num != "" && num != isNaN && num%1 == 0 && num > min)
+            return true;
+            else
+            return false; 
+    }
+
+
+    //ACA ESTA TODO MAL 
+    function validarDatos(){
+        if(document.getElementById("txt_nombre").value != "" && document.getElementById("txt_apellido").value != "" && validarEntero(document.getElementById("txt_edad").value,0)){
+            if(document.getElementById("select_filtrarABM").value==1 &&
+                document.getElementById("txt_alterEgo").value != "" &&
+                document.getElementById("txt_ciudad").value != "" &&
+                validarEntero(document.getElementById("txt_publicado").value, 1940))
+                {
+                    return true;
+            }else if (document.getElementById("select_filtrarABM").value==2 &&
+                document.getElementById("txt_enemigo").value != "" &&
+                validarEntero(document.getElementById("txt_robos").value ,0)&&
+                validarEntero(document.getElementById("txt_asesinatos").value , 0))
+                {
+                    return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }   
+    }
+
+
+    function alta(){
+        if(validarDatos())
+        {
+            if(document.getElementById("select_filtrarABM").value==1){
+            personas.push(new Heroe( 
+                        parseInt(document.getElementById("txt_id").value),
+                        document.getElementById("txt_nombre").value,
+                        document.getElementById("txt_apellido").value,
+                        parseInt(document.getElementById("txt_edad").value),
+                        document.getElementById("txt_alterEgo").value,
+                        document.getElementById("txt_ciudad").value,
+                        parseInt(document.getElementById("txt_publicado").value))
+                        )
+                        switchForm();
+            }else if(document.getElementById("select_filtrarABM").value==2){
+                personas.push(new Villano( 
+                            parseInt(document.getElementById("txt_id").value),
+                            document.getElementById("txt_nombre").value,
+                            document.getElementById("txt_apellido").value,
+                            parseInt(document.getElementById("txt_edad").value),
+                            document.getElementById("txt_enemigo").value,
+                            document.getElementById("txt_robos").value,
+                            parseInt(document.getElementById("txt_asesinatos").value))
+                            )
+                            switchForm();
+            }
+        }else{
+            alert("ERROR! Datos incorrectos/incompletos\n");
+        }
+    }
+
+    function eliminar(){
+        //BLOQUEAR BOTONES Y LABEL
+        for(let i=0; i<personas.length;i++){
+            if(personas[i].id == document.getElementById("txt_id").value)
+            {
+                if(confirm("¿¿Deseas elimiar??\n" + personas[i].toString())){
+                    personas.splice(i,1);
+                }
+            }
+        }
+        switchForm();
+    }
+
+    function modificar(){
+
+        if(validarDatos()){
+            for(let i=0; i<personas.length;i++){
+                if(personas[i].id == document.getElementById("txt_id").value)
+                {
+                    if(confirm("Confirmar modificacion\n")){
+                        personas[i].nombre = document.getElementById("txt_nombre").value;
+                        personas[i].apellido = document.getElementById("txt_apellido").value;
+                        personas[i].edad = document.getElementById("txt_edad").value;
+                        if (personaAux.hasOwnProperty("alterEgo")) {           
+                            personas[i].alterEgo = document.getElementById("txt_alterEgo").value;
+                            personas[i].ciudad = document.getElementById("txt_ciudad").value;
+                            personas[i].publicado = document.getElementById("txt_publicado").value;
+                            switchForm();
+                        } else {
+                            personas[i].enemigo = document.getElementById("txt_enemigo").value;
+                            personas[i].robos = document.getElementById("txt_robos").value;
+                            personas[i].asesinatos = document.getElementById("txt_asesinatos").value;
+                            document.getElementById("select_filtrarABM").value=2;
+                            switchForm();
+                        }
+                    }else{
+                        alert("Se cancelo la modificación");
+                        switchForm();
+                    }
+                }
+            }
+        }else{
+            alert("ERROR! Datos incorrectos/incompletos");   
+        }
+    }
+
+</script>
+</html>
